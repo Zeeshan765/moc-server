@@ -240,12 +240,15 @@ router.post('/signup', async (req, res) => {
     await User.create({
       name: req.body.name,
       email: req.body.email,
+      phone: req.body.phone,
       password: req.body.password,
       otp: OTP,
       otpExpiry: newOtpExpiry,
     });
   return res.status(200).json('User Created Successfully');
+
   }
+  
 });   
 
 
