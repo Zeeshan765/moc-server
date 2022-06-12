@@ -10,10 +10,10 @@ const messageSchema = new mongoose.Schema(
       type: String,
       ref: "Chat",
     },
-    contenttype: {
-      type: String,
+    // contenttype: {
+    //   type: String,
      
-    },
+    // },
     content: {
       type: String,
     },
