@@ -28,8 +28,14 @@ const UserSchema = new mongoose.Schema(
 
     resetPasswordToken: String,
     resetPasswordExpire: Date,
-    otp: String,
-    otpExpiry: Date,
+    verifyemailToken: String,
+    verifyemailExpire: Date,
+    verified: {
+      type: Boolean,
+      default: false,
+    },
+    // otp: String,
+    // otpExpiry: Date,
     //  resetOtpExpire: Date,
   },
   { timestamps: true }
@@ -70,6 +76,22 @@ UserSchema.methods.getResetPasswordToken = function () {
   return resetToken;
 };
 
+
+//Generate the email verify Token
+UserSchema.methods.getverifyemailToken = function () {
+  //Generate the Reset Token
+  const emailverifyToken = crypto.randomBytes(20).toString("hex");
+
+  //Hash the Above Reset Token add the verifyemailToken to user Schema
+  this.verifyemailToken = crypto
+    .createHash("sha256")
+    .update(emailverifyToken)
+    .digest("hex");
+
+  //Assign the emailverifyToken Expire Time
+  this.verifyemailExpire = Date.now() + 60 * 1000;
+  return emailverifyToken;
+};
 //Create the Model
 
 var User = mongoose.model('User', UserSchema);

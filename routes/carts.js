@@ -430,6 +430,46 @@ router.patch('/deleteItem/:id', authorization, async (req, res) => {
   }
 });
 
+
+
+
+
+
+
+
+
+
+
+
+//Delete Particular Item from the cart ---------->Mobile
+
+router.patch('/productdelete/:id', authorization, async (req, res) => {
+  try {
+    let cart = await Cart.findOne({ user: req.user._id });
+    if (cart) {
+      console.log('1');
+      //This remove cart from database
+      // if (cart.items.length <= 1) {
+      //   await Cart.findOneAndDelete({ _id: cart._id });
+      //   return res.send("Item Deleted");
+      // }
+      for (i = 0; i < cart.items.length; i++) {
+        console.log(cart.items[i]._id.toString());
+        if (cart.items[i]._id.toString() === req.params.id) {
+          console.log(cart.items[i]._id);
+          cart.items.splice(i, 1);
+          await Cart.findOneAndUpdate({ _id: cart._id }, { items: cart.items });
+          return res.send('Item Deleted Successfully');
+        }
+      }
+    }
+  } catch (error) {
+    console.log(error);
+    return res.send(error);
+  }
+});
+
+
 // // //UPDATE Increment
 // // router.get("/gettotal", authorization, async (req, res) => {
 // //   try {

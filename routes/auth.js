@@ -48,7 +48,7 @@ router.post('/login', async (req, res) => {
   console.log(user._id);
 });
 
-//Forget Password
+// //Forget Password
 router.post('/forgetpassword', async (req, res) => {
   /*try {
     const user = User.findOne({ email: req.body.email });
@@ -124,7 +124,7 @@ router.post('/forgetpassword', async (req, res) => {
   }
 });
 
-//Reset Password Route
+// //Reset Password Route
 
 router.put('/passwordreset/:resetToken', validateReset, async (req, res) => {
   //Hash the token which is provides in the url and generate the new token
@@ -159,6 +159,104 @@ router.put('/passwordreset/:resetToken', validateReset, async (req, res) => {
   }
 });
 
+router.post("/verify", async (req, res) => {
+  const user = await User.findOne({ email: req.body.email });
+
+  if (!user) {
+    return res.status(404).json("User Not Exist");
+  }
+
+  // Get ResetPassword Token
+  const verifyToken = user.getverifyemailToken();
+
+  await user.save();
+
+   const Url = `http://localhost:3000/confirmation/${verifyToken}/${user._id}`;
+  // const Url = `http://localhost:3000/confirmation/${verifyToken}`;
+
+  const message = `
+     <h1>Verify Your Email</h1>
+     <p>Please make Click the following link to verify Your Email:</p>
+     <a href=${Url} clicktracking=off>${Url}</a>
+   `;
+
+  try {
+    await sendEmail({
+      to: user.email,
+      subject: `Email Verification`,
+      text: message,
+    });
+
+    res.status(200).json({
+      message: `Email sent to ${user.email} successfully`,
+    });
+  } catch (error) {
+    user.verifyemailToken = undefined;
+    user.verifyemailExpire = undefined;
+
+    await user.save();
+
+    return res.status(500).json(" Email Could Not be  Send");
+  }
+});
+
+router.put("/confirmation/:verifyToken", async (req, res) => {
+  //Hash the token which is provides in the url and generate the new token
+  const verifyemailToken = crypto
+    .createHash("sha256")
+    .update(req.params.verifyToken)
+    .digest("hex");
+
+  try {
+    let user = await User.findOne({
+      verifyemailToken,
+      verifyemailExpire: { $gt: Date.now() },
+    });
+
+    //Check that Token is Expired or not
+    if (!user) {
+      return res.status(400).json("Token is Expired or Invalid");
+    }
+    user.verified = true;
+    user.verifyemailToken = undefined;
+    user.verifyemailExpire = undefined;
+
+    await user.save();
+
+    res.status(201).json({
+      success: true,
+      data: "Email Verified Successfully",
+    });
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 //send otp to user for forgot password
 router.post('/sendotp', async (req, res) => {
   const user = await User.findOne({ email: req.body.email });
@@ -168,9 +266,10 @@ router.post('/sendotp', async (req, res) => {
     let OTP = Math.floor(Math.random() * 10000 + 1).toString();
     console.log(OTP);
     console.log(user._id);
+    //let newOtpExpiry = Date.now() + 1 * 60 * 1000
     let newOtpExpiry = new Date(); // current time
     let nowMinutes = newOtpExpiry.getMinutes();
-    newOtpExpiry.setMinutes(nowMinutes + 5);
+    newOtpExpiry.setMinutes(nowMinutes + 2);
     console.log(newOtpExpiry);
     await User.findByIdAndUpdate(user._id, {
       otp: OTP,
@@ -201,7 +300,7 @@ router.post('/sendotp', async (req, res) => {
 //password reset of particular user
 router.put('/resetpassword/:id', async (req, res) => {
   const user = await User.findById(req.params.id);
-  console.log(user)
+  console.log(user.otpExpiry)
   if (user) {
     let nowTime = new Date();
     if (nowTime > user.otpExpiry) {
@@ -210,7 +309,7 @@ router.put('/resetpassword/:id', async (req, res) => {
         let resetPassword = await bcrypt.hash(req.body.password, salt);
         await User.findByIdAndUpdate(user._id, {
           password: resetPassword,
-          otpExpiry: nowTime,
+          otpExpiry: user.otpExpiry,
         });
         res.status(200).json('Password Reset Successfully');
       } else {
