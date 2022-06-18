@@ -10,7 +10,7 @@ const admin = require("../middleware/admin");
 
 router.post("/create", authorization, async (req, res) => {
   //send admin id
-  console.log(req.body);
+  console.log(req.body.admin);
   let chat = await Chat.findOne({ user: req.user._id, admin: req.body.admin });
   if (!chat) {
     chat = new Chat({
