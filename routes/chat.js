@@ -10,7 +10,7 @@ const admin = require("../middleware/admin");
 
 router.post("/create", authorization, async (req, res) => {
   //send admin id
-  console.log(req.body.admin);
+  //console.log(req.body.admin);
   let chat = await Chat.findOne({ user: req.user._id, admin: req.body.admin });
   if (!chat) {
     chat = new Chat({
@@ -32,7 +32,7 @@ router.get("/all", authorization, async (req, res) => {
   if (chatLength === 0) return res.status(400).json("No Chats Found");
   let count = 0;
   chats.forEach(async (chat) => {
-    await chat.populate("admin", "name");
+    await chat.populate("user", "name");
     count++;
     if (chatLength === count) {
       return res.status(200).json(chats);
@@ -82,8 +82,8 @@ router.post("/send/user", authorization, async (req, res) => {
 });
 
 //admin get messages from user
-router.get("/messages/user", authorization, async (req, res) => {
-  let messages = await Message.find({ chat: req.body.chat });
+router.get("/messages/user/:chat", authorization, async (req, res) => {
+  let messages = await Message.find({ chat: req.params.chat });
   if (!messages) return res.status(400).json("No Messages Found");
   const messageLength = messages.length;
   if (messageLength === 0) return res.status(400).json("No Messages Found");
@@ -106,3 +106,4 @@ router.get("/messages/user", authorization, async (req, res) => {
 // });
 module.exports = router;
 //eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjhiNDJhNmYwMmRmZTJhMDZiMWI1YTIiLCJuYW1lIjoiTXVoYW1tYWQgWmVlc2hhbiBBc2hyYWYiLCJyb2xlIjoidXNlciIsImlhdCI6MTY1NDUwMjEwNX0.gKTEZOEgHljRnB3bZwJKtRFff4ZXT4WyQgJOXF5-7AE
+//628afd313fdfbb446dbf3bbd
