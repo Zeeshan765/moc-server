@@ -99,10 +99,10 @@ router.get("/messages/user", authorization, async (req, res) => {
 
 
 // //get chat of a particular user by id
-// router.get("/particular/:id",  async (req, res) => {
-//   let chat = await Chat.findOne({ _id: req.params.id });
-//   if (!chat) return res.status(400).json("No Chat Found");
-//   return res.status(200).json(chat);
-// });
+router.get("/single/:id",  async (req, res) => {
+  let chat = await Chat.findOne({ _id: req.params.id });
+  if (!chat) return res.status(400).json("No Chat Found");
+  return res.status(200).json(chat);
+});
 module.exports = router;
 //eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjhiNDJhNmYwMmRmZTJhMDZiMWI1YTIiLCJuYW1lIjoiTXVoYW1tYWQgWmVlc2hhbiBBc2hyYWYiLCJyb2xlIjoidXNlciIsImlhdCI6MTY1NDUwMjEwNX0.gKTEZOEgHljRnB3bZwJKtRFff4ZXT4WyQgJOXF5-7AE
