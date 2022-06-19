@@ -53,8 +53,8 @@ router.post("/send", authorization, async (req, res) => {
 });
 
 //get user messages from admin
-router.get("/messages", authorization, async (req, res) => {
-  let messages = await Message.find({ chat: req.body.chat });
+router.get("/messages/:chat", authorization, async (req, res) => {
+  let messages = await Message.find({ chat: req.params.chat });
   if (!messages) return res.status(400).json("No Messages Found");
   const messageLength = messages.length;
   if (messageLength === 0) return res.status(400).json("No Messages Found");
