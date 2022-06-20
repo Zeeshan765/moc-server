@@ -118,6 +118,16 @@ router.delete('/:id', authorization, admin, async (req, res) => {
   }
 });
 
+
+
+//search user
+router.get('/search/:keyword', authorization, async (req, res) => {
+  let user = await User.find({
+    name: { $regex: req.params.keyword, $options: 'i' },
+  });
+  return res.json(user);
+});
+
 //GET USER STATS------->Admin
 
 router.get('/stats', authorization, admin, async (req, res) => {
