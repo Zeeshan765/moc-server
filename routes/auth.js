@@ -159,11 +159,11 @@ router.put('/passwordreset/:resetToken', validateReset, async (req, res) => {
   }
 });
 
-router.post("/verify", async (req, res) => {
+router.post('/verify', async (req, res) => {
   const user = await User.findOne({ email: req.body.email });
 
   if (!user) {
-    return res.status(404).json("User Not Exist");
+    return res.status(404).json('User Not Exist');
   }
 
   // Get ResetPassword Token
@@ -171,7 +171,7 @@ router.post("/verify", async (req, res) => {
 
   await user.save();
 
-   const Url = `http://localhost:3000/confirmation/${verifyToken}/${user._id}`;
+  const Url = `http://localhost:3000/confirmation/${verifyToken}/${user._id}`;
   // const Url = `http://localhost:3000/confirmation/${verifyToken}`;
 
   const message = `
@@ -196,16 +196,16 @@ router.post("/verify", async (req, res) => {
 
     await user.save();
 
-    return res.status(500).json(" Email Could Not be  Send");
+    return res.status(500).json(' Email Could Not be  Send');
   }
 });
 
-router.put("/confirmation/:verifyToken", async (req, res) => {
+router.put('/confirmation/:verifyToken', async (req, res) => {
   //Hash the token which is provides in the url and generate the new token
   const verifyemailToken = crypto
-    .createHash("sha256")
+    .createHash('sha256')
     .update(req.params.verifyToken)
-    .digest("hex");
+    .digest('hex');
 
   try {
     let user = await User.findOne({
@@ -215,7 +215,7 @@ router.put("/confirmation/:verifyToken", async (req, res) => {
 
     //Check that Token is Expired or not
     if (!user) {
-      return res.status(400).json("Token is Expired or Invalid");
+      return res.status(400).json('Token is Expired or Invalid');
     }
     user.verified = true;
     user.verifyemailToken = undefined;
@@ -225,37 +225,12 @@ router.put("/confirmation/:verifyToken", async (req, res) => {
 
     res.status(201).json({
       success: true,
-      data: "Email Verified Successfully",
+      data: 'Email Verified Successfully',
     });
   } catch (error) {
     console.log(error);
   }
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 //send otp to user for forgot password
 router.post('/sendotp', async (req, res) => {
@@ -269,7 +244,7 @@ router.post('/sendotp', async (req, res) => {
     //let newOtpExpiry = Date.now() + 1 * 60 * 1000
     let newOtpExpiry = new Date(); // current time
     let nowMinutes = newOtpExpiry.getMinutes();
-    newOtpExpiry.setMinutes(nowMinutes + 2);
+    newOtpExpiry.setMinutes(nowMinutes + 5);
     console.log(newOtpExpiry);
     await User.findByIdAndUpdate(user._id, {
       otp: OTP,
@@ -290,7 +265,7 @@ router.post('/sendotp', async (req, res) => {
         text: message,
       });
       res.status(200).json({
-        message: `Email sent to ${user.email} successfully`,
+        message: `OTP has been sent to ${user.email} successfully`,
       });
     } catch (error) {
       return res.status(500).json(' Email Could Not be  Send');
@@ -300,16 +275,16 @@ router.post('/sendotp', async (req, res) => {
 //password reset of particular user
 router.put('/resetpassword/:id', async (req, res) => {
   const user = await User.findById(req.params.id);
-  console.log(user.otpExpiry)
+  console.log(user.otpExpiry);
   if (user) {
     let nowTime = new Date();
-    if (nowTime > user.otpExpiry) {
+    if (user.otpExpiry > nowTime) {
       if (req.body.otp == user.otp) {
         let salt = await bcrypt.genSalt(10);
         let resetPassword = await bcrypt.hash(req.body.password, salt);
         await User.findByIdAndUpdate(user._id, {
           password: resetPassword,
-          otpExpiry: user.otpExpiry,
+          otpExpiry: nowTime,
         });
         res.status(200).json('Password Reset Successfully');
       } else {
@@ -323,34 +298,31 @@ router.put('/resetpassword/:id', async (req, res) => {
   }
 });
 
-//sign up user and verify user by sending otp to user and expire otp after 5 min
-router.post('/signup', async (req, res) => {
-  const user = await User.findOne({ email: req.body.email });
-  if (user) return res.status(400).json('User Already Exsist');
-  else {
-    //If user Exsist then send Otp to that user
-    let OTP = Math.floor(Math.random() * 10000 + 1).toString();
-    console.log(OTP);
-    console.log(user._id);
-    let newOtpExpiry = new Date(); // current time
-    let nowMinutes = newOtpExpiry.getMinutes();
-    newOtpExpiry.setMinutes(nowMinutes + 5);
-    console.log(newOtpExpiry);
-    await User.create({
-      name: req.body.name,
-      email: req.body.email,
-      phone: req.body.phone,
-      password: req.body.password,
-      otp: OTP,
-      otpExpiry: newOtpExpiry,
-    });
-  return res.status(200).json('User Created Successfully');
+// //sign up user and verify user by sending otp to user and expire otp after 5 min
+// router.post('/signup', async (req, res) => {
+//   const user = await User.findOne({ email: req.body.email });
+//   if (user) return res.status(400).json('User Already Exsist');
+//   else {
+//     //If user Exsist then send Otp to that user
+//     let OTP = Math.floor(Math.random() * 10000 + 1).toString();
+//     console.log(OTP);
+//     console.log(user._id);
+//     let newOtpExpiry = new Date(); // current time
+//     let nowMinutes = newOtpExpiry.getMinutes();
+//     newOtpExpiry.setMinutes(nowMinutes + 5);
+//     console.log(newOtpExpiry);
+//     await User.create({
+//       name: req.body.name,
+//       email: req.body.email,
+//       phone: req.body.phone,
+//       password: req.body.password,
+//       otp: OTP,
+//       otpExpiry: newOtpExpiry,
+//     });
+//   return res.status(200).json('User Created Successfully');
 
-  }
-  
-});   
+//   }
 
-
-
+// });
 
 module.exports = router;
