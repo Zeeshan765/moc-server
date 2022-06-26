@@ -258,6 +258,10 @@ router.post("/comments/:id", authorization, async (req, res) => {
       });
       await comment.save();
       product.comments.push(comment);
+      product.numReviews = product.comments.length;
+      product.rating =
+        product.comments.reduce((acc, item) => item.rating + acc, 0) /
+        product.comments.length;
       await product.save();
       console.log(comment);
       return res.json(comment);
@@ -279,6 +283,10 @@ router.post("/comments/:id", authorization, async (req, res) => {
         await comment.save();
 
         product.comments.push(comment);
+        product.numReviews = product.comments.length;
+        product.rating =
+          product.comments.reduce((acc, item) => item.rating + acc, 0) /
+          product.comments.length;
         await product.save();
         console.log(comment);
         return res.json(comment);
@@ -299,6 +307,10 @@ router.post("/comments/:id", authorization, async (req, res) => {
         await comment.save();
 
         product.comments.push(comment);
+        product.numReviews = product.comments.length;
+        product.rating =
+          product.comments.reduce((acc, item) => item.rating + acc, 0) /
+          product.comments.length;
         await product.save();
         console.log(comment);
         return res.json(comment);
@@ -344,4 +356,120 @@ router.get("/:id/get/comments", authorization, async (req, res) => {
 
   return res.send(component);
 });*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//post comment  on product after order is delivered
+router.post('commentsrating/:orderId', authorization, async (req, res) => {
+  if (req.body.type === 'Component') {
+    let product = await Component.findOne({ _id: req.params.id });
+
+    if (product) {
+      const alreadyReviewed = product.comments.find(
+        (r) => r.user.toString() === req.user._id.toString()
+      );
+
+      if (alreadyReviewed) {
+        res.status(400).json('Product already reviewed');
+      }
+
+      let comment = new Comment({
+        comment: req.body.comment,
+        rating: req.body.rating,
+        user: req.user.name,
+        product: req.params.id,
+      });
+      await comment.save();
+      product.comments.push(comment);
+      product.numReviews = product.comments.length;
+      product.rating =
+        product.comments.reduce((acc, item) => item.rating + acc, 0) /
+        product.comments.length;
+      await product.save();
+      console.log(comment);
+      return res.json(comment);
+    } else {
+      res.status(404).json('Product not found');
+    }
+  } else if (req.body.type === 'Product') {
+    {
+      let product = await Product.findOne({ _id: req.params.id });
+
+      if (product) {
+        const alreadyReviewed = product.comments.find(
+          (r) => r.user.toString() === req.user._id.toString()
+        );
+
+        if (alreadyReviewed) {
+          res.status(400).json('Product already reviewed');
+        }
+
+        let comment = new Comment({
+          comment: req.body.comment,
+          rating: req.body.rating,
+          user: req.user.name,
+          product: req.params.id,
+        });
+        await comment.save();
+        product.comments.push(comment);
+        product.numReviews = product.comments.length;
+        product.rating =
+          product.comments.reduce((acc, item) => item.rating + acc, 0) /
+          product.comments.length;
+        await product.save();
+        console.log(comment);
+        return res.json(comment);
+      } else {
+        res.status(404).json('Product not found');
+      }
+    }
+  } else if (req.body.type === 'Custom') {
+    {
+      let product = await Product.findOne({ _id: req.params.id });
+
+      if (product) {
+        const alreadyReviewed = product.comments.find(
+          (r) => r.user.toString() === req.user._id.toString()
+        );
+
+        if (alreadyReviewed) {
+          res.status(400).json('Product already reviewed');
+        }
+
+        let comment = new Comment({
+          comment: req.body.comment,
+          rating: req.body.rating,
+          user: req.user.name,
+          product: req.params.id,
+        });
+        await comment.save();
+        product.comments.push(comment);
+        product.numReviews = product.comments.length;
+        product.rating =
+          product.comments.reduce((acc, item) => item.rating + acc, 0) /
+          product.comments.length;
+        await product.save();
+        console.log(comment);
+        return res.json(comment);
+      } else {
+        res.status(404).json('Product not found');
+      }
+    }
+  }
+});
+
+
+
+
 module.exports = router;

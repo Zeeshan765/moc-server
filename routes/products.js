@@ -481,7 +481,7 @@ router.get('/:id/get/comments', authorization, async (req, res) => {
 });*/
 
 //post comment  on product after order is delivered
-router.post('/:id/commentsrating/:orderId', authorization, async (req, res) => {
+router.post('commentsrating/:orderId', authorization, async (req, res) => {
   if (req.body.type === 'Component') {
     let product = await Component.findById(req.params.id);
 
