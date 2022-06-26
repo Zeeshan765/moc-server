@@ -3,8 +3,8 @@ const express = require('express');
 let router = express.Router();
 const Cart = require('../models/Cart');
 const authorization = require('../middleware/authorization');
-const admin = require("../middleware/admin")
-
+const admin = require('../middleware/admin');
+const sendEmail = require('../utilis/sendEmail');
 //Create Order
 router.post('/newOrder', authorization, async (req, res) => {
   const { orderItems, address, city, phoneNo, amount } = req.body;
@@ -95,7 +95,7 @@ router.get('/myfind/:id', authorization, async (req, res) => {
 //   }
 // });
 
-router.put('/status/:_id', authorization, admin,async (req, res) => {
+router.put('/status/:_id', authorization, admin, async (req, res) => {
   try {
     const order = await Order.findOne({ _id: req.params._id });
 
@@ -123,8 +123,7 @@ router.put('/status/:_id', authorization, admin,async (req, res) => {
 //get all orders
 // router.get('/allorders1', authorization, admin,async (req, res) => {
 //   try {
-    
-  
+
 //     const orders = await Order.find();
 
 //     return res.json( orders );;
@@ -137,16 +136,19 @@ router.put('/status/:_id', authorization, admin,async (req, res) => {
 // });
 
 //get all orders
-router.get('/allorders', authorization, admin,async (req, res) => {
+router.get('/allorders', authorization, admin, async (req, res) => {
   try {
     let page = Number(req.query.page ? req.query.page : 1);
     let perPage = Number(req.query.perPage ? req.query.perPage : 10);
     let skipRecords = perPage * (page - 1);
-  
-    const orders = await Order.find().sort({ _id: -1 }).skip(skipRecords).limit(perPage);
+
+    const orders = await Order.find()
+      .sort({ _id: -1 })
+      .skip(skipRecords)
+      .limit(perPage);
 
     let total = await Order.countDocuments();
-    return res.json({ total, orders });;
+    return res.json({ total, orders });
     //console.log(orders.length)
 
     //return res.status(200).json(orders);
@@ -154,8 +156,6 @@ router.get('/allorders', authorization, admin,async (req, res) => {
     return res.status(500).json('Internal Server Error');
   }
 });
-
-
 
 //get order status----->Filter
 router.get('/:status', async (req, res) => {
@@ -166,7 +166,7 @@ router.get('/:status', async (req, res) => {
 });
 
 //admin get single order
-router.get('/find/:id',authorization, admin, async (req, res) => {
+router.get('/find/:id', authorization, admin, async (req, res) => {
   try {
     const order = await Order.findById(req.params.id).populate(
       'user',
@@ -182,7 +182,7 @@ router.get('/find/:id',authorization, admin, async (req, res) => {
 });
 
 //get all orders count
-router.get('/get/countorders',authorization, admin, async (req, res) => {
+router.get('/get/countorders', authorization, admin, async (req, res) => {
   try {
     var count = 0;
     const total = await Order.find();
@@ -194,91 +194,122 @@ router.get('/get/countorders',authorization, admin, async (req, res) => {
   }
 });
 //Get Pending Orders Counts
-router.get("/get/pendingorders",async(req,res)=>{
+router.get('/get/pendingorders', async (req, res) => {
   try {
     const orders = await Order.find();
-    const order1= orders.filter((order)=>
-      order.status ==="Pending")
-      const pending = order1.length
+    const order1 = orders.filter((order) => order.status === 'Pending');
+    const pending = order1.length;
     //console.log(orders.length)
 
     return res.status(200).json(pending);
   } catch (err) {
     return res.status(500).json('Internal Server Error');
   }
-})
-
+});
 
 //Get Processing Orders Counts
-router.get("/get/processingorders",async(req,res)=>{
+router.get('/get/processingorders', async (req, res) => {
   try {
     const orders = await Order.find();
-    const order1= orders.filter((order)=>
-      order.status ==="Processing")
-      const processing = order1.length
+    const order1 = orders.filter((order) => order.status === 'Processing');
+    const processing = order1.length;
     //console.log(orders.length)
 
     return res.status(200).json(processing);
   } catch (err) {
     return res.status(500).json('Internal Server Error');
   }
-})
-
+});
 
 //Get Delievered Orders Counts
-router.get("/get/delieveredorders",async(req,res)=>{
+router.get('/get/delieveredorders', async (req, res) => {
   try {
     const orders = await Order.find();
-    const order1= orders.filter((order)=>
-      order.status ==="Delivered")
-      const delievered = order1.length
+    const order1 = orders.filter((order) => order.status === 'Delivered');
+    const delievered = order1.length;
     //console.log(orders.length)
 
     return res.status(200).json(delievered);
   } catch (err) {
     return res.status(500).json('Internal Server Error');
   }
-})
+});
 
 //Get total revenue
-router.get('/get/totalrevenue',authorization,admin, async (req, res) => {
+router.get('/get/totalrevenue', authorization, admin, async (req, res) => {
   try {
     var total = 0;
     const totalprice = await Order.find();
-   
+
     totalprice.forEach((order) => {
       total += order.amount;
-      
     });
-    
+
     return res.status(200).json(total);
   } catch (err) {
     return res.status(500).json('Internal Server Error');
   }
 });
 
-//send email after order placed to user
+//Send order id to email
 router.post('/sendemail', async (req, res) => {
+  const order = await Order.findById(req.body.id);
+  if (!order) {
+    return res.status(404).json('No Order Found Against this id');
+  }
+  // const email = order.user.email;
+  // const subject = 'Order Placed Successfully';
+  // const text = `Your Order has been Placed Successfully. Your Order Id is ${order._id}`;
+  // const mailOptions = {
+  //   from:
+
+  const message = `
+    <h4>Hi,</h4>
+    <p>Your Order has been Placed Successfully. Your Order Id is ${order._id}</p>
+    
+
+  `;
   try {
-    const { email, subject, text } = req.body;
-    const mailOptions = {
-      from: '"shaniashraf999@gmail.com"',
-      to: user.email,
-      subject: `Order Placed`,
-      text: `Your Order Placed Successfully`,
-    };
-    transporter.sendMail(mailOptions, function (error, info) {
-      if (error) {
-        console.log(error);
-      } else {
-        console.log('Email sent: ' + info.response);
-      }
+    await sendEmail({
+      to: order.user.email,
+      subject: `Order Placed Successfully`,
+      text: message,
     });
-    return res.status(200).json('Email Sent Successfully');
-  } catch (err) {
-    return res.status(500).json('Internal Server Error');
+    res.status(200).json({
+      message: `Email has been sent to ${order._id} successfully`,
+    });
+  } catch (error) {
+    return res.status(500).json(' Email Could Not be  Send');
   }
 });
+
+
+
+//search order by id
+router.get('/search/:id', async (req, res) => {
+  const id = req.params.id;
+  const order = await Order.findById(id);
+  if (!order) {
+    return res.status(404).json('No Order Found Against this id');
+  }
+  return res.status(200).json(order);
+}
+);
+
+
+//search product on bais of id 
+router.get('/searchorder/:id', async (req, res) => {
+  let id = req.params.id;
+  let products = await Product.find({
+    $or: [{ _id: { $regex: id, $options: 'i' } }],
+  });
+  return res.json(products);
+}
+);
+
+
+
+
 
 
 

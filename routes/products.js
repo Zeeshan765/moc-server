@@ -59,7 +59,10 @@ router.get('/all', authorization, admin, async (req, res) => {
   let perPage = Number(req.query.perPage ? req.query.perPage : 10);
   let skipRecords = perPage * (page - 1);
 
-  let products = await Product.find().sort({ _id: -1 }).skip(skipRecords).limit(perPage);
+  let products = await Product.find()
+    .sort({ _id: -1 })
+    .skip(skipRecords)
+    .limit(perPage);
 
   let total = await Product.countDocuments();
   return res.send({ total, products });
@@ -313,21 +316,21 @@ router.get('/filter/:min/:max', async (req, res) => {
   return res.json(products); //return res.json(components);
 });
 
-//post comments on product
-router.post('/:id/comments', authorization, async (req, res) => {
-  let product = await Product.findById(req.params.id);
-  let comment = new Comment({
-    comment: req.body.comment,
-    rating: req.body.rating,
-    user: req.user.name,
-    product: product._id,
-  });
-  await comment.save();
-  product.comments.push(comment);
-  await product.save();
-  console.log(comment);
-  return res.json(comment);
-});
+// //post comments on product
+// router.post('/:id/comments', authorization, async (req, res) => {
+//   let product = await Product.findById(req.params.id);
+//   let comment = new Comment({
+//     comment: req.body.comment,
+//     rating: req.body.rating,
+//     user: req.user.name,
+//     product: product._id,
+//   });
+//   await comment.save();
+//   product.comments.push(comment);
+//   await product.save();
+//   console.log(comment);
+//   return res.json(comment);
+// });
 
 //post comment  on product after order is delivered
 router.post('/:id/comments/:orderId', authorization, async (req, res) => {
@@ -387,25 +390,25 @@ router.get('/:id/get/comments', authorization, async (req, res) => {
   return res.json(product.comments);
 });
 
-//post rating and review on product
-router.post('/:id/ratings', authorization, async (req, res) => {
-  let product = await Product.findById(req.params.id);
-  let rating = new Rating({
-    rating: req.body.rating,
-    user: req.user._id,
-    product: product._id,
-  });
-  await rating.save();
-  product.ratings.push(rating);
-  await product.save();
-  return res.json(rating);
-});
+// //post rating and review on product
+// router.post('/:id/ratings', authorization, async (req, res) => {
+//   let product = await Product.findById(req.params.id);
+//   let rating = new Rating({
+//     rating: req.body.rating,
+//     user: req.user._id,
+//     product: product._id,
+//   });
+//   await rating.save();
+//   product.ratings.push(rating);
+//   await product.save();
+//   return res.json(rating);
+// });
 
-//get ratings and reviews on product
-router.get('/:id/ratings', authorization, async (req, res) => {
-  let product = await Product.findById(req.params.id);
-  return res.json(product.ratings);
-});
+// //get ratings and reviews on product
+// router.get('/:id/ratings', authorization, async (req, res) => {
+//   let product = await Product.findById(req.params.id);
+//   return res.json(product.ratings);
+// });
 
 // if(req.file){
 //   const updatedata= {
@@ -476,4 +479,132 @@ router.get('/:id/ratings', authorization, async (req, res) => {
 
   return res.send(product);
 });*/
+
+//post comment  on product after order is delivered
+router.post('/:id/commentsrating/:orderId', authorization, async (req, res) => {
+  if (req.body.type === 'Component') {
+    let product = await Component.findById(req.params.id);
+
+    if (product) {
+      const alreadyReviewed = product.comments.find(
+        (r) => r.user.toString() === req.user._id.toString()
+      );
+
+      if (alreadyReviewed) {
+        res.status(400).json('Product already reviewed');
+      }
+
+      let comment = new Comment({
+        comment: req.body.comment,
+        rating: req.body.rating,
+        user: req.user.name,
+        product: product._id,
+      });
+      await comment.save();
+      product.comments.push(comment);
+      product.numReviews = product.comments.length;
+      product.rating =
+        product.comments.reduce((acc, item) => item.rating + acc, 0) /
+        product.comments.length;
+      await product.save();
+      console.log(comment);
+      return res.json(comment);
+    } else {
+      res.status(404).json('Product not found');
+    }
+  } else if (req.body.type === 'Product') {
+    {
+      let product = await Product.findById(req.params.id);
+
+      if (product) {
+        const alreadyReviewed = product.comments.find(
+          (r) => r.user.toString() === req.user._id.toString()
+        );
+
+        if (alreadyReviewed) {
+          res.status(400).json('Product already reviewed');
+        }
+
+        let comment = new Comment({
+          comment: req.body.comment,
+          rating: req.body.rating,
+          user: req.user.name,
+          product: product._id,
+        });
+        await comment.save();
+        product.comments.push(comment);
+        product.numReviews = product.comments.length;
+        product.rating =
+          product.comments.reduce((acc, item) => item.rating + acc, 0) /
+          product.comments.length;
+        await product.save();
+        console.log(comment);
+        return res.json(comment);
+      } else {
+        res.status(404).json('Product not found');
+      }
+    }
+  } else if (req.body.type === 'Custom') {
+    {
+      let product = await Product.findById(req.params.id);
+
+      if (product) {
+        const alreadyReviewed = product.comments.find(
+          (r) => r.user.toString() === req.user._id.toString()
+        );
+
+        if (alreadyReviewed) {
+          res.status(400).json('Product already reviewed');
+        }
+
+        let comment = new Comment({
+          comment: req.body.comment,
+          rating: req.body.rating,
+          user: req.user.name,
+          product: product._id,
+        });
+        await comment.save();
+        product.comments.push(comment);
+        product.numReviews = product.comments.length;
+        product.rating =
+          product.comments.reduce((acc, item) => item.rating + acc, 0) /
+          product.comments.length;
+        await product.save();
+        console.log(comment);
+        return res.json(comment);
+      } else {
+        res.status(404).json('Product not found');
+      }
+    }
+  }
+});
+
+
+
+
+//search product by name and company
+router.get('/searchproduct/:name/:company', async (req, res) => {
+  let name = req.params.name;
+  let company = req.params.company;
+  let products = await Product.find({
+    $or: [{ name: { $regex: name, $options: 'i' } }, { company: { $regex: company, $options: 'i' } }],
+  });
+  return res.json(products);
+}
+);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 module.exports = router;

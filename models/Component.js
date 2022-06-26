@@ -63,9 +63,14 @@ const componentSchema = new mongoose.Schema(
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Comment',
-    
-  }
-  ],
+      },
+    ],
+    rating: {
+      type: Number,
+    },
+    numReviews: {
+      type: Number,
+    },
   },
   { timestamps: true }
 );
@@ -82,7 +87,6 @@ function validateComponent(data) {
     info2: Joi.string().min(3).max(25).required(),
     info3: Joi.string().min(3).max(25).required(),
     info4: Joi.string().min(3).max(25).required(),
-    
   });
   return schema.validate(data, { abortEarly: false });
 }
