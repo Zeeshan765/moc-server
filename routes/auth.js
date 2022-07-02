@@ -300,11 +300,6 @@ router.put('/resetpassword/:id', async (req, res) => {
 });
 
 
-//find user by email
-router.get('/finduser/:email', async (req, res) => {
-  const user = await User.findOne({ email: req.params.email });
-
-
 
 
 
