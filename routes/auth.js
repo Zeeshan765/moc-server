@@ -301,40 +301,41 @@ router.put('/resetpassword/:id', async (req, res) => {
 //verify otp that is sent to user
 router.put('/verifyotp/:id', async (req, res) => {
   const user = await User.findById(req.params.id);
-  console.log(user.otpExpiry);
-  
-}); 
-    
+  //console.log(user.otpExpiry);
+  if (user) {
+    let nowTime = new Date();
+    // console.log(nowTime);
+    if (user.otpExpiry > nowTime) {
+      if (req.body.otp == user.otp) {
+      res.status(200).json('OTP is Valid');
+      }
+      else {
+        res.status(400).json('OTP is Invalid');
+      }
+    } else {
+      res.status(400).json('OTP is Expired');
+    }
+  } else {
+    res.status(400).json('User Not Found');
+  }
+});
+
 //reset password after otp verification
 router.put('/changepassword/:id', async (req, res) => {
   const user = await User.findById(req.params.id);
   if (!user) return res.status(400).json('user not found');
-  
+
   if (user) {
     let salt = await bcrypt.genSalt(10);
-        let resetPassword = await bcrypt.hash(req.body.password, salt);
-        await User.findByIdAndUpdate(user._id, {
-          password: resetPassword,
-          
-        });
-        res.status(200).json('Password Reset Successfully');
-      } else {
-        res.status(400).json('Password Not Reset');
-      }
-    
-    
+    let resetPassword = await bcrypt.hash(req.body.password, salt);
+    await User.findByIdAndUpdate(user._id, {
+      password: resetPassword,
+    });
+    res.status(200).json('Password Reset Successfully');
+  } else {
+    res.status(400).json('Password Not Reset');
+  }
 });
-
-
-
-
-
-
-
-
-
-
-
 
 // //sign up user and verify user by sending otp to user and expire otp after 5 min
 // router.post('/signup', async (req, res) => {
