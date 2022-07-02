@@ -443,7 +443,7 @@ router.patch('/deleteItem/:id', authorization, async (req, res) => {
 
 //Delete Particular Item from the cart ---------->Mobile
 
-router.patch('/productdelete/:id', authorization, async (req, res) => {
+router.delete('/productdelete/:id', authorization, async (req, res) => {
   try {
     let cart = await Cart.findOne({ user: req.user._id });
     if (cart) {
