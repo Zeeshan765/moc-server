@@ -302,21 +302,7 @@ router.put('/resetpassword/:id', async (req, res) => {
 router.put('/verifyotp/:id', async (req, res) => {
   const user = await User.findById(req.params.id);
   console.log(user.otpExpiry);
-  if (user) {
-    let nowTime = new Date();
-    if (user.otpExpiry > nowTime) {
-      if (req.body.otp == user.otp) {
-        
-        res.status(200).json('OTP  is valid');
-      } else {
-        res.status(400).json('OTP is Invalid');
-      }
-    } else {
-      res.status(400).json('OTP is Expired');
-    }
-  } else {
-    res.status(400).json('User Not Found');
-  }
+  
 }); 
     
 //reset password after otp verification
