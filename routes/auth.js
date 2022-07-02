@@ -159,78 +159,78 @@ router.put('/passwordreset/:resetToken', validateReset, async (req, res) => {
   }
 });
 
-router.post('/verify', async (req, res) => {
-  const user = await User.findOne({ email: req.body.email });
+// router.post('/verify', async (req, res) => {
+//   const user = await User.findOne({ email: req.body.email });
 
-  if (!user) {
-    return res.status(404).json('User Not Exist');
-  }
+//   if (!user) {
+//     return res.status(404).json('User Not Exist');
+//   }
 
-  // Get ResetPassword Token
-  const verifyToken = user.getverifyemailToken();
+//   // Get ResetPassword Token
+//   const verifyToken = user.getverifyemailToken();
 
-  await user.save();
+//   await user.save();
 
-  const Url = `http://localhost:3000/confirmation/${verifyToken}/${user._id}`;
-  // const Url = `http://localhost:3000/confirmation/${verifyToken}`;
+//   const Url = `http://localhost:3000/confirmation/${verifyToken}/${user._id}`;
+//   // const Url = `http://localhost:3000/confirmation/${verifyToken}`;
 
-  const message = `
-     <h1>Verify Your Email</h1>
-     <p>Please make Click the following link to verify Your Email:</p>
-     <a href=${Url} clicktracking=off>${Url}</a>
-   `;
+//   const message = `
+//      <h1>Verify Your Email</h1>
+//      <p>Please make Click the following link to verify Your Email:</p>
+//      <a href=${Url} clicktracking=off>${Url}</a>
+//    `;
 
-  try {
-    await sendEmail({
-      to: user.email,
-      subject: `Email Verification`,
-      text: message,
-    });
+//   try {
+//     await sendEmail({
+//       to: user.email,
+//       subject: `Email Verification`,
+//       text: message,
+//     });
 
-    res.status(200).json({
-      message: `Email sent to ${user.email} successfully`,
-    });
-  } catch (error) {
-    user.verifyemailToken = undefined;
-    user.verifyemailExpire = undefined;
+//     res.status(200).json({
+//       message: `Email sent to ${user.email} successfully`,
+//     });
+//   } catch (error) {
+//     user.verifyemailToken = undefined;
+//     user.verifyemailExpire = undefined;
 
-    await user.save();
+//     await user.save();
 
-    return res.status(500).json(' Email Could Not be  Send');
-  }
-});
+//     return res.status(500).json(' Email Could Not be  Send');
+//   }
+// });
 
-router.put('/confirmation/:verifyToken', async (req, res) => {
-  //Hash the token which is provides in the url and generate the new token
-  const verifyemailToken = crypto
-    .createHash('sha256')
-    .update(req.params.verifyToken)
-    .digest('hex');
+// router.put('/confirmation/:verifyToken', async (req, res) => {
+//   //Hash the token which is provides in the url and generate the new token
+//   const verifyemailToken = crypto
+//     .createHash('sha256')
+//     .update(req.params.verifyToken)
+//     .digest('hex');
 
-  try {
-    let user = await User.findOne({
-      verifyemailToken,
-      verifyemailExpire: { $gt: Date.now() },
-    });
+//   try {
+//     let user = await User.findOne({
+//       verifyemailToken,
+//       verifyemailExpire: { $gt: Date.now() },
+//     });
 
-    //Check that Token is Expired or not
-    if (!user) {
-      return res.status(400).json('Token is Expired or Invalid');
-    }
-    user.verified = true;
-    user.verifyemailToken = undefined;
-    user.verifyemailExpire = undefined;
+//     //Check that Token is Expired or not
+//     if (!user) {
+//       return res.status(400).json('Token is Expired or Invalid');
+//     }
+//     user.verified = true;
+//     user.verifyemailToken = undefined;
+//     user.verifyemailExpire = undefined;
 
-    await user.save();
+//     await user.save();
 
-    res.status(201).json({
-      success: true,
-      data: 'Email Verified Successfully',
-    });
-  } catch (error) {
-    console.log(error);
-  }
-});
+//     res.status(201).json({
+//       success: true,
+//       data: 'Email Verified Successfully',
+//     });
+//   } catch (error) {
+//     console.log(error);
+//   }
+// });
 
 //send otp to user for forgot password
 router.post('/sendotp', async (req, res) => {
@@ -297,6 +297,58 @@ router.put('/resetpassword/:id', async (req, res) => {
     res.status(400).json('User Not Found');
   }
 });
+
+//verify otp that is sent to user
+router.put('/verifyotp/:id', async (req, res) => {
+  const user = await User.findById(req.params.id);
+  console.log(user.otpExpiry);
+  if (user) {
+    let nowTime = new Date();
+    if (user.otpExpiry > nowTime) {
+      if (req.body.otp == user.otp) {
+        
+        res.status(200).json('OTP  is valid');
+      } else {
+        res.status(400).json('OTP is Invalid');
+      }
+    } else {
+      res.status(400).json('OTP is Expired');
+    }
+  } else {
+    res.status(400).json('User Not Found');
+  }
+}); 
+    
+//reset password after otp verification
+router.put('/changepassword/:id', async (req, res) => {
+  const user = await User.findById(req.params.id);
+  if (!user) return res.status(400).json('user not found');
+  
+  if (user) {
+    let salt = await bcrypt.genSalt(10);
+        let resetPassword = await bcrypt.hash(req.body.password, salt);
+        await User.findByIdAndUpdate(user._id, {
+          password: resetPassword,
+          
+        });
+        res.status(200).json('Password Reset Successfully');
+      } else {
+        res.status(400).json('Password not Reset');
+      }
+    
+    
+});
+
+
+
+
+
+
+
+
+
+
+
 
 // //sign up user and verify user by sending otp to user and expire otp after 5 min
 // router.post('/signup', async (req, res) => {
