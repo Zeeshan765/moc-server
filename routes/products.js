@@ -474,11 +474,6 @@ router.get('/filter/:min/:max', async (req, res) => {
 //   return res.status(500).json('Product Cant be updated');
 // }
 
-/*router.put('/:id', async (req, res) => {
-  let product = await Product.findByIdAndUpdate(req.params.id, req.body);
-
-  return res.send(product);
-});*/
 
 
 
