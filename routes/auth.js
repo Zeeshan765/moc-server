@@ -299,10 +299,6 @@ router.put('/resetpassword/:id', async (req, res) => {
   }
 });
 
-
-
-
-
 //verify otp that is sent to user
 router.put('/verifyotp/:id', async (req, res) => {
   const user = await User.findById(req.params.id);
@@ -312,9 +308,8 @@ router.put('/verifyotp/:id', async (req, res) => {
     // console.log(nowTime);
     if (user.otpExpiry > nowTime) {
       if (req.body.otp == user.otp) {
-      res.status(200).json('OTP is Valid');
-      }
-      else {
+        res.status(200).json('OTP is Valid');
+      } else {
         res.status(400).json('OTP is Invalid');
       }
     } else {
