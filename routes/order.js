@@ -300,7 +300,7 @@ router.get('/search/:id', async (req, res) => {
 //search product on bais of id 
 router.get('/searchorder/:id', async (req, res) => {
   let id = req.params.id;
-  let products = await Product.find({
+  let products = await Order.find({
     $or: [{ _id: { $regex: id, $options: 'i' } }],
   });
   return res.json(products);

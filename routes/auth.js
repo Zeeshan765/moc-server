@@ -265,6 +265,7 @@ router.post('/sendotp', async (req, res) => {
         text: message,
       });
       res.status(200).json({
+        id: user._id,
         message: `OTP has been sent to ${user.email} successfully`,
       });
     } catch (error) {
@@ -297,6 +298,15 @@ router.put('/resetpassword/:id', async (req, res) => {
     res.status(400).json('User Not Found');
   }
 });
+
+
+//find user by email
+router.get('/finduser/:email', async (req, res) => {
+  const user = await User.findOne({ email: req.params.email });
+
+
+
+
 
 //verify otp that is sent to user
 router.put('/verifyotp/:id', async (req, res) => {
