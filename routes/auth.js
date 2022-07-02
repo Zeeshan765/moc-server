@@ -333,7 +333,7 @@ router.put('/changepassword/:id', async (req, res) => {
         });
         res.status(200).json('Password Reset Successfully');
       } else {
-        res.status(400).json('Password not Reset');
+        res.status(400).json('Password Not Reset');
       }
     
     
