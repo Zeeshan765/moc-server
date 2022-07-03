@@ -7,12 +7,12 @@ const admin = require('../middleware/admin');
 const sendEmail = require('../utilis/sendEmail');
 //Create Order
 router.post('/newOrder', authorization, async (req, res) => {
-  const { orderItems, address, city, phoneNo, amount } = req.body;
+  // const { orderItems, address, city, phoneNo, amount } = req.body;
+  const { orderItems, address, amount } = req.body;
+
   const newOrder = await Order.create({
     orderItems,
     address,
-    city,
-    phoneNo,
     amount,
     paidAt: Date.now(),
     user: req.user._id,
@@ -27,12 +27,37 @@ router.post('/newOrder', authorization, async (req, res) => {
 });
 
 //custom order
-router.post('/newCustomOrder', authorization, async (req, res) => {
-  const { orderItems, address, city, phoneNo, amount, type } = req.body;
+// router.post('/post', authorization, async (req, res) => {
+//    const { orderItems, address,phoneNo,amount, type } = req.body;
+//    const newOrder = await Order.create({
+//     orderItems,
+//     address,
+//     phoneNo,
+//     amount,
+//     type,
+//     paidAt: Date.now(),
+//     user: req.user._id,
+//   });
+//   try {
+//     const savedOrder = await newOrder.save();
+//     await Cart.findOneAndDelete({ user: req.user._id });
+//     return res.status(200).json(savedOrder);
+//   } catch (err) {
+//     return res.status(500).json(err);
+//   }
+//   //  console.log(phoneNo);
+// // console.log({ orderItems, address,amount, type })
+
+
+// });
+
+router.post("/NewCustomOrders",authorization,async(req,res)=>{
+  //res.send("ok")
+  // const { orderItems, address,amount, type } = req.body;
+  const { orderItems, address,phoneNo,amount, type } = req.body;
   const newOrder = await Order.create({
     orderItems,
     address,
-    city,
     phoneNo,
     amount,
     type,
@@ -46,7 +71,10 @@ router.post('/newCustomOrder', authorization, async (req, res) => {
   } catch (err) {
     return res.status(500).json(err);
   }
-});
+  // console.log({phoneNo});
+
+}
+  )
 
 //Get Logged in User all Order---->My Order
 router.get('/myorders', authorization, async (req, res) => {
@@ -316,3 +344,6 @@ router.get('/searchorder/:id', async (req, res) => {
 
 
 module.exports = router;
+
+
+

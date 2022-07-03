@@ -22,15 +22,22 @@ const orderSchema = new mongoose.Schema(
         },
       },
     ],
-    //type: Object
-    address: {  
-    city: {
-      type: String,
+
+    address: {
+      line1: {
+        type: Object,
+      },
+
+      city: {
+        type: String,
+      },
+      
     },
     phoneNo: {
       type: String,
     },
-  },
+    //type: Object
+
     type: { type: String },
 
     status: { type: String, default: 'Pending' },
