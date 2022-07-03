@@ -7,7 +7,6 @@ const admin = require('../middleware/admin');
 const sendEmail = require('../utilis/sendEmail');
 //Create Order
 router.post('/newOrder', authorization, async (req, res) => {
-  // const { orderItems, address, city, phoneNo, amount } = req.body;
   const { orderItems, address, amount } = req.body;
 
   const newOrder = await Order.create({
