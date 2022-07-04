@@ -65,9 +65,9 @@ const componentSchema = new mongoose.Schema(
         ref: 'Comment',
       },
     ],
-    rating: {
-      type: Number,
-    },
+    // rating: {
+    //   type: Number,
+    // },
     numReviews: {
       type: Number,
     },

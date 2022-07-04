@@ -260,8 +260,10 @@ router.post("/comments/:id", authorization, async (req, res) => {
       product.comments.push(comment);
       product.numReviews = product.comments.length;
       product.rating =
-        product.comments.reduce((acc, item) => item.rating + acc, 0) /
-        product.comments.length;
+        product.comments.rating.reduce((acc, item) => item.rating + acc, 0) /
+        product.comments.rating.length;
+        console.log(product.comments.rating.reduce((acc, item) => item.rating + acc, 0) /
+        product.comments.rating.length)
       await product.save();
       console.log(comment);
       return res.json(comment);
@@ -273,7 +275,9 @@ router.post("/comments/:id", authorization, async (req, res) => {
       try {
         let product = await Product.findOne({
           _id: req.params.id,
-        });
+        }).populate("comments");
+        console.log(product);
+
         let comment = new Comment({
           comment: req.body.comment,
           rating: req.body.rating,
@@ -287,6 +291,7 @@ router.post("/comments/:id", authorization, async (req, res) => {
         product.rating =
           product.comments.reduce((acc, item) => item.rating + acc, 0) /
           product.comments.length;
+      
         await product.save();
         console.log(comment);
         return res.json(comment);
@@ -309,8 +314,10 @@ router.post("/comments/:id", authorization, async (req, res) => {
         product.comments.push(comment);
         product.numReviews = product.comments.length;
         product.rating =
-          product.comments.reduce((acc, item) => item.rating + acc, 0) /
-          product.comments.length;
+          product.comments.rating.reduce((acc, item) => item.rating + acc, 0) /
+          product.comments.rating.length;
+       console.log(product.comments.rating.reduce((acc, item) => item.rating + acc, 0) /
+       product.comments.rating.length)
         await product.save();
         console.log(comment);
         return res.json(comment);
