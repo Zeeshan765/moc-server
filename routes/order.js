@@ -100,6 +100,24 @@ router.get('/myfind/:id', authorization, async (req, res) => {
   }
 });
 
+
+
+
+
+//get user single order--->new
+router.get('/mysinglefind/:id', authorization, async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id);
+    if (!order) {
+      return res.status(404).json('No Order Found Against this id');
+    }
+    return res.status(200).json(order);
+  } catch (err) {
+    return res.status(500).json(err);
+  }
+});
+
+
 //Update Order Status
 // router.put('/status/:id', async (req, res) => {
 //   try {
@@ -138,6 +156,15 @@ router.put('/status/:_id', authorization, admin, async (req, res) => {
           deliveredAt: new Date(),
         });
         return res.status(200).json('Order Update Successfully');
+        
+      }
+      else if (order.status === 'Delivered') {
+        await Order.findByIdAndUpdate(order._id, {
+          status: req.body.status,
+          deliveredAt: new Date(),
+        });
+        return res.status(200).json('Order Update Successfully');
+        
       }
       return res.status(400).json('Order Could Not be  Updated ');
     }
@@ -208,6 +235,12 @@ router.get('/find/:id', authorization, admin, async (req, res) => {
   }
 });
 
+
+
+
+
+
+
 //get all orders count
 router.get('/get/countorders', authorization, admin, async (req, res) => {
   try {
@@ -261,6 +294,27 @@ router.get('/get/delieveredorders', async (req, res) => {
     return res.status(500).json('Internal Server Error');
   }
 });
+
+
+//Get Cancelled Orders Counts
+router.get('/get/cancelledorders', async (req, res) => {
+  try {
+    const orders = await Order.find();
+    const order1 = orders.filter((order) => order.status === 'Cancelled');
+    const cancel = order1.length;
+    //console.log(orders.length)
+
+    return res.status(200).json(cancel);
+  } catch (err) {
+    return res.status(500).json('Internal Server Error');
+  }
+});
+
+
+
+
+
+
 
 //Get total revenue
 router.get('/get/totalrevenue', authorization, admin, async (req, res) => {
