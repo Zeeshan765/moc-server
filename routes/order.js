@@ -140,6 +140,71 @@ router.get('/mysinglefind/:id', authorization, async (req, res) => {
 //   }
 // });
 
+
+
+//Update Order Status
+// router.put('/status/:id', async (req, res) => {
+//   try {
+//     const order = await Order.findById(req.params.id);
+//     if (!order) {
+//       return res.status(404).json('No Order Found Against this id');
+//     } else {
+//      
+//         await Order.findOneAndUpdate(order._id, { status: 'Processing' });
+//         return res.status(200).json('Order Status Updated Successfully');
+//       } else if (order.status === 'Processing') {
+//         await Order.findOneAndUpdate(order._id, { status: 'Delievered' });
+//         return res.status(200).json('Order Status Updated Successfully');
+//       }
+//       return res.status(400).json('Order Could Not be  Updated ');
+//     }
+//   } catch (error) {
+//     console.log(error);
+//     return res.status(500).json('Internal Server Error ');
+//   }
+// });
+
+
+
+router.put('/cancel/:_id', authorization, async (req, res) => {
+  try {
+    const order = await Order.findOne({ _id: req.params._id });
+
+    if (!order) {
+      return res.status(404).json('No Order Found Against this id');
+    } 
+    
+    
+    else {
+      
+        await Order.findByIdAndUpdate(order._id, { status: "Cancelled" });
+        return res.status(200).json('Order Cancel Successfully');
+    }
+     
+    }
+   catch (error) {
+    console.log(error);
+    return res.status(500).json('Internal Server Error ');
+  }
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 router.put('/status/:_id', authorization, admin, async (req, res) => {
   try {
     const order = await Order.findOne({ _id: req.params._id });
