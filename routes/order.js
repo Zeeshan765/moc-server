@@ -190,7 +190,18 @@ router.put('/cancel/:_id', authorization, async (req, res) => {
 
 
 
+// get 
 
+//Get Logged in User all Order---->My Order
+router.get('/adminorders/:_id', authorization,admin, async (req, res) => {
+  try {
+    const orders = await Order.find({ user: req.params._id });
+    console.log(orders)
+    return res.status(200).json(orders);
+  } catch (err) {
+    return res.status(500).json(err);
+  }
+});
 
 
 
