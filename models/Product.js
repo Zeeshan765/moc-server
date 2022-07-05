@@ -43,9 +43,9 @@ const productSchema = new mongoose.Schema(
         ref: 'Comment',
       },
     ],
-  //   rating: {
-  //     type: Number,
-  // },
+    rate: {
+      type: Number,
+  },
   numReviews: {
       type: Number,
    

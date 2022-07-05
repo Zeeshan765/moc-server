@@ -82,6 +82,7 @@ router.get('/find/:id', async (req, res) => {
 
   try {
     let product = await Product.findById(id);
+    console.log(product)
     if (!product)
       return res.status(400).send('Product With given ID is not present');
     return res.json(product);
@@ -383,12 +384,12 @@ router.get('/filter/:min/:max', async (req, res) => {
 // });
 
 // //get comments on product
-// router.get('/:id/get/comments', authorization, async (req, res) => {
-//   let product = await Product.findById(req.params.id).populate('comments');
-//   console.log(product);
-//   console.log(product.comments);
-//   return res.json(product.comments);
-// });
+router.get('/:id/get/comments', authorization, async (req, res) => {
+  let product = await Product.findById(req.params.id).populate('comments');
+  console.log(product);
+  console.log(product.comments);
+  return res.json(product.comments);
+});
 
 // //post rating and review on product
 // router.post('/:id/ratings', authorization, async (req, res) => {

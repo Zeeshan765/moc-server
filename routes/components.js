@@ -259,12 +259,17 @@ router.post("/comments/:id", authorization, async (req, res) => {
       await comment.save();
       product.comments.push(comment);
       product.numReviews = product.comments.length;
-      product.rating =
-        product.comments.rating.reduce((acc, item) => item.rating + acc, 0) /
-        product.comments.rating.length;
-        console.log(product.comments.rating.reduce((acc, item) => item.rating + acc, 0) /
-        product.comments.rating.length)
-      await product.save();
+      product.rate =
+        product.comments.reduce((acc, item) => item.rating + acc, 0) /
+        product.comments.length;
+        await product.save();
+      // product.numReviews = product.comments.length;
+      // product.rating =
+      //   product.comments.rating.reduce((acc, item) => item.rating + acc, 0) /
+      //   product.comments.rating.length;
+      //   console.log(product.comments.rating.reduce((acc, item) => item.rating + acc, 0) /
+      //   product.comments.rating.length)
+      // await product.save();
       console.log(comment);
       return res.json(comment);
     } catch (err) {
@@ -288,9 +293,13 @@ router.post("/comments/:id", authorization, async (req, res) => {
 
         product.comments.push(comment);
         product.numReviews = product.comments.length;
-        product.rating =
+        product.rate =
           product.comments.reduce((acc, item) => item.rating + acc, 0) /
           product.comments.length;
+        // product.numReviews = product.comments.length;
+        // product.rating =
+        //   product.comments.reduce((acc, item) => item.rating + acc, 0) /
+        //   product.comments.length;
       
         await product.save();
         console.log(comment);
@@ -313,11 +322,17 @@ router.post("/comments/:id", authorization, async (req, res) => {
 
         product.comments.push(comment);
         product.numReviews = product.comments.length;
-        product.rating =
-          product.comments.rating.reduce((acc, item) => item.rating + acc, 0) /
-          product.comments.rating.length;
-       console.log(product.comments.rating.reduce((acc, item) => item.rating + acc, 0) /
-       product.comments.rating.length)
+        product.rate =
+          product.comments.reduce((acc, item) => item.rating + acc, 0) /
+          product.comments.length;
+        
+        
+        // product.numReviews = product.comments.length;
+      //   product.rating =
+      //     product.comments.rating.reduce((acc, item) => item.rating + acc, 0) /
+      //     product.comments.rating.length;
+      //  console.log(product.comments.rating.reduce((acc, item) => item.rating + acc, 0) /
+      //  product.comments.rating.length)
         await product.save();
         console.log(comment);
         return res.json(comment);
