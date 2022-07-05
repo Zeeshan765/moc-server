@@ -43,13 +43,15 @@ const productSchema = new mongoose.Schema(
         ref: 'Comment',
       },
     ],
-    rate: {
-      type: Number,
-  },
-  numReviews: {
-      type: Number,
+  //   rated: {
+  //     type: Number,
+  //     default: 0,
+  // },
+  // numReviews: {
+  //     type: Number,
+      
    
-    },
+  //   },
   },
   { timestamps: true }
 );

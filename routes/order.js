@@ -442,27 +442,27 @@ router.post('/sendemail', async (req, res) => {
 
 
 
-//search order by id
-router.get('/search/:id', async (req, res) => {
-  const id = req.params.id;
-  const order = await Order.findById(id);
-  if (!order) {
-    return res.status(404).json('No Order Found Against this id');
-  }
-  return res.status(200).json(order);
-}
-);
+// //search order by id
+// router.get('/search/:id', async (req, res) => {
+//   const id = req.params.id;
+//   const order = await Order.findById(id);
+//   if (!order) {
+//     return res.status(404).json('No Order Found Against this id');
+//   }
+//   return res.status(200).json(order);
+// }
+// );
 
 
-//search product on bais of id 
-router.get('/searchorder/:id', async (req, res) => {
-  let id = req.params.id;
-  let products = await Order.find({
-    $or: [{ _id: { $regex: id, $options: 'i' } }],
-  });
-  return res.json(products);
-}
-);
+// //search product on bais of id 
+// router.get('/searchorder/:id', async (req, res) => {
+//   let id = req.params.id;
+//   let products = await Order.find({
+//     $or: [{ _id: { $regex: id, $options: 'i' } }],
+//   });
+//   return res.json(products);
+// }
+// );
 
 
 
