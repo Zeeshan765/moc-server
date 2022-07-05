@@ -409,8 +409,15 @@ router.get('/get/totalrevenue', authorization, admin, async (req, res) => {
 });
 
 //Send order id to email
-router.post('/sendemail', async (req, res) => {
-  const order = await Order.findById(req.body.id);
+router.post('/sendemail/:id', async (req, res) => {
+
+  const order = await Order.findById(req.params.id).populate(
+    'user',
+    'name email'
+  );
+
+
+
   if (!order) {
     return res.status(404).json('No Order Found Against this id');
   }
@@ -422,7 +429,7 @@ router.post('/sendemail', async (req, res) => {
 
   const message = `
     <h4>Hi,</h4>
-    <p>Your Order has been Placed Successfully. Your Order Id is ${order._id}</p>
+    <p>Thank You For Shopping In Multiverse of Computers.We have Recieved You Order. Your Order Tracking Id is ${order._id}</p>
     
 
   `;
@@ -433,7 +440,7 @@ router.post('/sendemail', async (req, res) => {
       text: message,
     });
     res.status(200).json({
-      message: `Email has been sent to ${order._id} successfully`,
+      message: `Email has been sent to ${order.user.email} successfully`,
     });
   } catch (error) {
     return res.status(500).json(' Email Could Not be  Send');
@@ -463,9 +470,6 @@ router.post('/sendemail', async (req, res) => {
 //   return res.json(products);
 // }
 // );
-
-
-
 
 
 
