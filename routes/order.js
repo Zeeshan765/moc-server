@@ -409,7 +409,7 @@ router.get('/get/totalrevenue', authorization, admin, async (req, res) => {
 });
 
 //Send order id to email
-router.post('/sendemail/:id', async (req, res) => {
+router.post('/sendemail/:id', authorization, admin,async (req, res) => {
 
   const order = await Order.findById(req.params.id).populate(
     'user',
