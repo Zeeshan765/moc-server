@@ -421,6 +421,9 @@ router.post('/sendemail/:id', async (req, res) => {
   if (!order) {
     return res.status(404).json('No Order Found Against this id');
   }
+
+
+  
   // const email = order.user.email;
   // const subject = 'Order Placed Successfully';
   // const text = `Your Order has been Placed Successfully. Your Order Id is ${order._id}`;
